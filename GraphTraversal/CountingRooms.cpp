@@ -1,50 +1,41 @@
+// CountingRoom
 // https://cses.fi/problemset/task/1192
 #include<bits/stdc++.h>
 using namespace std;
 
-const int maxN = 1005;
-int n, m, ans;
-int mp[maxN][maxN];
-bool vi[maxN][maxN];
+int n, m, noRoom;
+string grid[1007];
+bool vi[1007][1007] = {false};
+
+void bfs(int initi, int initj){
+    queue<pair<int, int>> q;
+    q.push({initi, initj});
+    while(not q.empty()){
+        auto [i, j] = q.front();
+        q.pop();
+        if(i < 0 or i >= n or j < 0 or j >= m) continue;
+        if(grid[i][j] == '#') continue;
+        if(vi[i][j]) continue;
+        vi[i][j] = true;
+        q.push({i+1, j});
+        q.push({i-1, j});
+        q.push({i, j+1});
+        q.push({i, j-1});
+    }
+}
 
 int main(){
+    cin.tie(nullptr)->sync_with_stdio(false);
     cin >> n >> m;
-    for(int i = 1; i <= n; i++){
-        string s;
-        cin >> s;
-        for(int j = 1; j <= m; j++){
-            mp[i][j] = s[j-1];
+    for(int i = 0; i < n; ++i)
+        cin >> grid[i];
+    for(int i = 0; i < n; ++i){
+        for(int j = 0; j < m; ++j){
+            if(grid[i][j] == '#') continue;
+            if(vi[i][j]) continue;
+            ++noRoom;
+            bfs(i, j);
         }
     }
-    for(int i = 1; i <= n; i++){
-        for(int j = 1; j <= m; j++){
-            if(!vi[i][j] && mp[i][j] == '.'){
-                ans++;
-                queue<pair<int, int>> q;
-                q.push({i, j});
-                vi[i][j] = true;
-                while(!q.empty()){
-                    int x = q.front().first, y = q.front().second;
-                    q.pop();
-                    if(!vi[x-1][y] && mp[x-1][y] == '.'){
-                        q.push({x-1, y});
-                        vi[x-1][y] = true;
-                    }
-                    if(!vi[x+1][y] && mp[x+1][y] == '.'){
-                        q.push({x+1, y});
-                        vi[x+1][y] = true;
-                    }
-                    if(!vi[x][y-1] && mp[x][y-1] == '.'){
-                        q.push({x, y-1});
-                        vi[x][y-1] = true;
-                    }
-                    if(!vi[x][y+1] && mp[x][y+1] == '.'){
-                        q.push({x, y+1});
-                        vi[x][y+1] = true;
-                    }
-                }
-            }
-        }
-    }
-    cout << ans;
+    cout << noRoom << '\n';
 }
